@@ -1,0 +1,72 @@
+#include<iostream>
+#include<map>
+#include<set>
+#include<list>
+#include<climits>
+using namespace std;
+template<typename t>
+class Graph{
+    map<t,list<pair<t,int>>> m;
+    public:
+    void addEdge(t x, t y,int wt,bool bid){
+        m[x].push_back(make_pair(y,wt));
+        if(bid)
+        {
+            m[y].push_back(make_pair(x,wt));
+        }
+    }
+    void printAdj (){
+        for(auto nbr:m)
+        {
+            cout<<nbr.first<<"->";
+            for(auto nbrs:nbr.second)
+            {
+                cout<<"("<<nbrs.first<<" ,"<<nbrs.second<<")";
+            }
+        }
+    }
+    void dijkstra(t src)
+    {
+        map<t,int> dist;
+        for(auto j:m){
+            dist[j.first]=INT_MAX;
+        }
+        set<pair<int,t>>s;
+        dist[src]=0;
+        s.insert(make_pair(0,src));
+        while(!s.empty()){
+            auto p=*(s.begin());
+            t node = p.second;
+            int nodeDist = p.first;
+            s.erase(s.begin());
+            for(auto childpair:m[node])
+            {
+                if(nodeDist + childpair.second < dist[childpair.first])
+                {
+                    t dest = childpair.first;
+                    auto f = s.find(make_pair(dist[dest],dest));
+                    if(f != s.end())
+                {
+                    s.erase(f);
+                }
+                dist[dest]= nodeDist + childpair.second;
+                s.insert(make_pair(dist[dest],dest));
+                }
+            }
+        }
+        for(auto d:dist)
+        {
+            cout<<d.first<<" is located at distance of "<<d.second<<endl;
+        }
+
+    }
+};
+int main(){
+    Graph<string> g;
+    g.addEdge("delhi","bombay",4,false);
+    g.addEdge("delhi","chennai",5,true);
+    g.addEdge("kanpur","bombay",9,true);
+    g.addEdge("gaya","bombay",100,true);
+    g.addEdge("jamshedpur","delhi",305,true);
+    g.dijkstra("delhi");
+}
